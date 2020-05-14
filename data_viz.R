@@ -1,4 +1,5 @@
 library(tidyverse)
+library(cowplot)
 library(paletteer)
 library(extrafont)
 #fonttable <- fonttable()
@@ -37,7 +38,9 @@ islander_pop <- readxl::read_xlsx("data/race_islander_data.xlsx",col_names = c("
 # Four or more races	0.4%
 pob <- readxl::read_xlsx("data/place_of_birth_citizenship.xlsx",col_names = c("place_of_birth","population"),
                                   range = "A2:B11") %>% 
-  filter(!(place_of_birth %in% c("Male","Female",	"Foreign born")))
+  filter(!(place_of_birth %in% c("Male","Female",	"Foreign born"))) %>% 
+  mutate(label = "Place of Birth") %>% 
+  mutate(pct = prop.table(population))
 
 
 
@@ -54,14 +57,32 @@ pop_data <- rbind(asians_pop,islander_pop) %>%
   summarise(pop = sum(population)) %>% 
   ungroup()
   
+
 # Plot
-pop_data %>% 
+pop_plot <- pop_data %>% 
   ggplot(aes(fct_reorder(race,pop),pop, fill = group)) +
   geom_col(show.legend = FALSE) +
   geom_text(aes(race,pop, label = scales::comma(pop)),nudge_y = 50000, family = "Inconsolata", size = 4.5, hjust = 0) +
   labs(title = "    Asian and Pacific Islanders Populations", x = "", y = "") +
   scale_y_continuous(expand = expansion(0,0),labels = scales::comma, limits = c(0,5600000)) +
   scale_fill_paletteer_d("rcartocolor::Pastel") +
-  coord_flip() +
-  ggsave("asian_americans.png", device = "png", type = "cairo", width = 17, height = 9, dpi = 300)
+  coord_flip()
 
+pob_plot <- pob %>% 
+  ggplot(aes(label, population, fill = fct_reorder(place_of_birth,population))) +
+  geom_col(show.legend = FALSE) +
+  labs(title = "Of the 22.1 million Asians in the US, 57.1% are foreign born",x = "", y = "") + 
+  geom_text(aes(label = scales::percent(pct)), 
+            position = position_stack(vjust = 0.5), family = "Karla", size = 4) +
+  scale_fill_paletteer_d("rcartocolor::Pastel") +
+  coord_flip() +
+  theme_nothing()+
+  theme(axis.line.y = element_blank(),
+        plot.margin = margin(0),
+        axis.text.y = element_blank(),
+        plot.title = element_text("Karla", face = "bold", size = 16, color = "gray20", hjust = 0.16))
+  
+pop_plot %>% 
+  ggdraw() +
+  draw_plot(pob_plot,.35,.1,.5,.1) +
+  ggsave("asian_americans.png", device = "png", type = "cairo", width = 17, height = 9, dpi = 300)
