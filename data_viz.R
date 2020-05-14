@@ -23,10 +23,23 @@ asians_pop <- readxl::read_xlsx("data/race_data.xlsx",col_names = c("race","popu
                                range = "C4:D26") %>% 
   mutate(group = "asians")
 
-# https://data.census.gov/cedsci/table?t=Native Hawaiian and Pacific Islander&tid=ACSDT1Y2018.B02016&hidePreview=false&vintage=2018
+# Source: https://data.census.gov/cedsci/table?t=Native Hawaiian and Pacific Islander&tid=ACSDT1Y2018.B02016&hidePreview=false&vintage=2018
 islander_pop <- readxl::read_xlsx("data/race_islander_data.xlsx",col_names = c("race","population"),
                                    range = "D5:E17") %>% 
   mutate(group = "islander")
+
+# Source: https://data.census.gov/cedsci/table?q=S0201&t=031 - Asian alone or in combination with one or more other races  (400-499) %26 (100-299) or (300, A01-Z99) or (400-999)%3ARace and Ethnicity&tid=ACSSPP1Y2018.S0201&hidePreview=true&tp=false
+# Asian alone or in combination with one or more other races
+# Total population: 22,137,269
+# One race	83.2%
+# Two races	14.4%
+# Three races	2.1%
+# Four or more races	0.4%
+pob <- readxl::read_xlsx("data/place_of_birth_citizenship.xlsx",col_names = c("place_of_birth","population"),
+                                  range = "A2:B11") %>% 
+  filter(!(place_of_birth %in% c("Male","Female",	"Foreign born")))
+
+
 
 # Data Prep
 pop_data <- rbind(asians_pop,islander_pop) %>%  
