@@ -53,7 +53,6 @@ entered <- readxl::read_xlsx("data/place_of_birth_citizenship.xlsx",col_names = 
 pop_data <- rbind(asians_pop,islander_pop) %>%  
   drop_na(population) %>% 
   mutate(population = as.numeric(str_replace_all(population,",","")),
-         #race = if_else(population < 61416,"Other",race),
          race = case_when(str_detect(race,"Other") & group == "islander" ~ "Other Pacific Islander",
                           str_detect(race,"Other") & group == "asians" ~ "Other Asian",
                           TRUE ~ race),
@@ -68,13 +67,10 @@ pop_plot <- pop_data %>%
   ggplot(aes(fct_reorder(race,pop),pop, fill = group)) +
   geom_col(show.legend = FALSE) +
   geom_text(aes(race,pop, label = scales::comma(pop)),nudge_y = 50000, family = "Inconsolata", size = 4.5, hjust = 0) +
-  labs(
-    #title = "Asian and Pacific Islander American Heritage Month", 
-    title = "<span style = 'color:#18377A;'>Asian</span> and <span style = 'color:#4DC9CC;'>Pacific Islander</span> Populations in the United States", x = "", y = "",
+  labs(title = "<span style = 'color:#18377A;'>Asian</span> and <span style = 'color:#4DC9CC;'>Pacific Islander</span> Populations in the United States", x = "", y = "",
     caption = "Source: Estimates from the U.S. Census Bureau’s 2018 American Community Survey") +
   scale_y_continuous(expand = expansion(0,0),labels = scales::comma, limits = c(0,5600000)) +
   scale_fill_manual(values = c("#18377A","#55DDE0")) +
-  #scale_fill_paletteer_d("RColorBrewer::Set2") +
   coord_flip() +
   theme(plot.title = element_markdown(),
         plot.title.position = "plot")
@@ -97,11 +93,7 @@ pob_plot <- pob %>%
              vjust = 1,
              fontface = "bold",
              fill = "#F3F4F6",
-             #box.padding = 0.5,
-             #color = "#F3F4F6",
-             #position = position_dodge(0.9),
-            family = "Karla", size = 5) +
-  #scale_fill_manual(values = c("#DCB0F2","#F89C74","#8BE0A4")) +
+             family = "Karla", size = 5) +
   scale_x_continuous(expand = expansion(0,0),limits=c(-0.2,1.5)) +
   scale_fill_paletteer_d("jcolors::pal9") +
   scale_color_paletteer_d("jcolors::pal9") +
@@ -118,7 +110,6 @@ entered_plot <- entered %>%
   geom_segment( aes(x=entered, xend=entered, y=0, yend=pct), size = 2, show.legend = FALSE, color = "#FF7844") +
   geom_point(size = 5, show.legend = FALSE, color = "#FF7844") +
   geom_text(aes(label = scales::percent(pct)), 
-            #position = position_stack(vjust = 0.5), 
             vjust = -1.6,
             family = "Karla", size = 5) + 
   labs(title = "Most <span style = 'color:#18377A;'>foreign born Asians</span> in America<br>have been here for more than <span style = 'color:#FF7844;'>10 years</span>",x = "", y = "") + 
@@ -134,4 +125,3 @@ pop_plot %>%
   draw_plot(pob_plot,.40,.045,.57,.2) +
   draw_plot(entered_plot,.5,.29,.425,.5) +
   ggsave("asian_americans.png", device = "png", type = "cairo", width = 17, height = 10, dpi = 300)
-
