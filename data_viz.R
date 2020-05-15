@@ -9,18 +9,17 @@ loadfonts(device = "win", quiet = TRUE)
 
 # Theme
 theme_set(theme_minimal())
-theme <- theme_update(text = element_text(family = "Karla", size = 13),
-                      title = element_text("Karla", size = 24, color = "gray20"),
+theme <- theme_update(title = element_text("Karla", size = 24, color = "gray20"),
                       plot.title = element_text("Karla", face = "bold", size = 26, color = "gray50", hjust = 0.05),
                       #plot.title.position = "plot",
-                      plot.subtitle = element_text("Inter",size = 26, color = "gray20"),
                       panel.grid = element_blank(),
                       axis.text = element_text(size = 14),
                       axis.text.x = element_blank(),
                       axis.line.x = element_blank(),
                       axis.line.y = element_line(color = "gray80"),
-                      plot.margin = margin(35, 30, 5,5 ),
-                      plot.background = element_rect(fill = "#F3F4F6", color = "#F3F4F6"))
+                      plot.margin = margin(35, 30, 5, 10),
+                      plot.background = element_rect(fill = "#F3F4F6", color = "#F3F4F6"),
+                      plot.caption = element_text(size = 12))
 
 # Source: https://data.census.gov/cedsci/table?g=0100043US_0400000US06&hidePreview=false&tid=ACSDT1Y2018.B02018&table=DP05&vintage=2018&cid=HCT011001&t=Asian&layer=VT_2010_040_00_PY_D1
 asians_pop <- readxl::read_xlsx("data/race_data.xlsx",col_names = c("race","population"),
@@ -72,7 +71,8 @@ pop_plot <- pop_data %>%
   geom_text(aes(race,pop, label = scales::comma(pop)),nudge_y = 50000, family = "Inconsolata", size = 4.5, hjust = 0) +
   labs(
     #title = "Asian and Pacific Islander American Heritage Month", 
-    title = "<span style = 'color:#18377A;'>Asian</span> and <span style = 'color:#55DDE0;'>Pacific Islander</span> Populations in the United States", x = "", y = "") +
+    title = "<span style = 'color:#18377A;'>Asian</span> and <span style = 'color:#4DC9CC;'>Pacific Islander</span> Populations in the United States", x = "", y = "",
+    caption = "Source:  U.S. Census Bureau’s 2018 American Community Survey") +
   scale_y_continuous(expand = expansion(0,0),labels = scales::comma, limits = c(0,5600000)) +
   scale_fill_manual(values = c("#18377A","#55DDE0")) +
   #scale_fill_paletteer_d("RColorBrewer::Set2") +
@@ -80,11 +80,11 @@ pop_plot <- pop_data %>%
   theme(plot.title = element_markdown(),
         plot.title.position = "plot")
 
-pob_plot <- 
-  pob %>% 
+
+pob_plot <- pob %>% 
   ggplot(aes(label, population, fill = fct_reorder(place_of_birth,population))) +
   geom_col(show.legend = FALSE) +
-  labs(title = "Of the 22.1 million <span style = 'color:#18377A;'>Asians</span>  in the US, <span style = 'color:#18377A;'>57.1%</span> are foreign born",x = "", y = "") + 
+  labs(title = "Of the <span style = 'color:#353535;'>22.1 million</span><span style = 'color:#18377A;'> Asians</span>  in the US, <span style = 'color:#353535;'>57.1% are foreign born</span>",x = "", y = "") + 
   geom_text(aes(label = scales::percent(pct)),
             color = "#F3F4F6",
             fontface = "bold",
@@ -102,7 +102,7 @@ pob_plot <-
              #position = position_dodge(0.9),
             family = "Karla", size = 5) +
   #scale_fill_manual(values = c("#DCB0F2","#F89C74","#8BE0A4")) +
-  scale_x_continuous(expand = expansion(0.15,0),limits=c(-0.2,1.5)) +
+  scale_x_continuous(expand = expansion(0,0),limits=c(-0.2,1.5)) +
   scale_fill_paletteer_d("jcolors::pal9") +
   scale_color_paletteer_d("jcolors::pal9") +
   coord_flip() +
@@ -110,7 +110,8 @@ pob_plot <-
   theme(axis.line.y = element_blank(),
         plot.margin = margin(0),
         axis.text.y = element_blank(),
-        plot.title = element_markdown("Karla", face = "bold", size = 20, color = "gray50", hjust = 0.22))
+        plot.title = element_markdown("Karla", face = "bold", size = 20, color = "gray50", hjust = 0.22, lineheight = 1.3))
+
 
 entered_plot <- entered %>% 
   ggplot(aes(entered, pct)) +
@@ -120,17 +121,17 @@ entered_plot <- entered %>%
             #position = position_stack(vjust = 0.5), 
             vjust = -1.6,
             family = "Karla", size = 5) + 
-  labs(title = "Most <span style = 'color:#18377A;'>Asians</span> in America have been here for more than <span style = 'color:#FF7844;'>10 years</span>",x = "", y = "") + 
+  labs(title = "Most <span style = 'color:#18377A;'>foreign born Asians</span> in America<br>have been here for more than <span style = 'color:#FF7844;'>10 years</span>",x = "", y = "") + 
   scale_x_discrete(labels = c("Entered\nbefore 2000","Entered\n2000 to 2009","Entered\n2010 or later")) +
-  scale_y_continuous(expand = expansion(0,0), limits = c(0,.54)) +
+  scale_y_continuous(expand = expansion(0,0), limits = c(0,.57)) +
   theme(axis.line.y = element_blank(),
         axis.text.y = element_blank(),
         axis.text.x = element_text("Karla", face = "bold", size = 14),
-        plot.title = element_markdown("Karla", face = "bold", size = 20, color = "gray50", hjust = 0.3))
+        plot.title = element_markdown("Karla", face = "bold", size = 20, color = "gray50", hjust = 0.55, lineheight = 1.3))
 
 pop_plot %>% 
   ggdraw() +
   draw_plot(pob_plot,.40,.045,.57,.2) +
-  draw_plot(entered_plot,.47,.27,.425,.5) +
+  draw_plot(entered_plot,.5,.29,.425,.5) +
   ggsave("asian_americans.png", device = "png", type = "cairo", width = 17, height = 10, dpi = 300)
 
