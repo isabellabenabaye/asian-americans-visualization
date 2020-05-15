@@ -1,7 +1,6 @@
 library(tidyverse)
 library(cowplot)
 library(ggtext)
-library(ggrepel)
 library(paletteer)
 library(extrafont)
 #fonttable <- fonttable()
@@ -72,7 +71,7 @@ pop_plot <- pop_data %>%
   labs(
     #title = "Asian and Pacific Islander American Heritage Month", 
     title = "<span style = 'color:#18377A;'>Asian</span> and <span style = 'color:#4DC9CC;'>Pacific Islander</span> Populations in the United States", x = "", y = "",
-    caption = "Source:  U.S. Census Bureau’s 2018 American Community Survey") +
+    caption = "Source: Estimates from the U.S. Census Bureau’s 2018 American Community Survey") +
   scale_y_continuous(expand = expansion(0,0),labels = scales::comma, limits = c(0,5600000)) +
   scale_fill_manual(values = c("#18377A","#55DDE0")) +
   #scale_fill_paletteer_d("RColorBrewer::Set2") +
@@ -84,7 +83,8 @@ pop_plot <- pop_data %>%
 pob_plot <- pob %>% 
   ggplot(aes(label, population, fill = fct_reorder(place_of_birth,population))) +
   geom_col(show.legend = FALSE) +
-  labs(title = "Of the <span style = 'color:#353535;'>22.1 million</span><span style = 'color:#18377A;'> Asians</span>  in the US, <span style = 'color:#353535;'>57.1% are foreign born</span>",x = "", y = "") + 
+  # 22.6M based on the census.gov site: https://www.census.gov/newsroom/facts-for-features/2020/aian.html
+  labs(title = "Of the <span style = 'color:#353535;'>22.6 million</span><span style = 'color:#18377A;'> Asians</span>  in the US, <span style = 'color:#353535;'>57.1% are foreign born</span>",x = "", y = "") + 
   geom_text(aes(label = scales::percent(pct)),
             color = "#F3F4F6",
             fontface = "bold",
