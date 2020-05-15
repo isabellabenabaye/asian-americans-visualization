@@ -62,7 +62,7 @@ pop_data <- rbind(asians_pop,islander_pop) %>%
   ungroup()
   
 
-# Plot
+# Bar chart - main plot
 pop_plot <- pop_data %>% 
   ggplot(aes(fct_reorder(race,pop),pop, fill = group)) +
   geom_col(show.legend = FALSE) +
@@ -75,16 +75,18 @@ pop_plot <- pop_data %>%
   theme(plot.title = element_markdown(),
         plot.title.position = "plot")
 
-
+# Stacked bar plot
 pob_plot <- pob %>% 
   ggplot(aes(label, population, fill = fct_reorder(place_of_birth,population))) +
   geom_col(show.legend = FALSE) +
   # 22.6M based on the census.gov site: https://www.census.gov/newsroom/facts-for-features/2020/aian.html
   labs(title = "Of the <span style = 'color:#353535;'>22.6 million</span><span style = 'color:#18377A;'> Asians</span>  in the US, <span style = 'color:#353535;'>57.1% are foreign born</span>",x = "", y = "") + 
+  ## percent labels
   geom_text(aes(label = scales::percent(pct)),
             color = "#F3F4F6",
             fontface = "bold",
             position = position_stack(vjust = 0.5), family = "Karla", size = 5) + 
+  ## category labels
   geom_label(aes(x = label, y = c(0,7462176+2000000,16963096+50000),
                  label = c("U.S. born","Foreign born;\nnaturalized U.S. citizen","Foreign born;\nnot a U.S. citizen"), 
                  color = fct_reorder(place_of_birth,population)),
@@ -94,9 +96,9 @@ pob_plot <- pob %>%
              fontface = "bold",
              fill = "#F3F4F6",
              family = "Karla", size = 5) +
-  scale_x_continuous(expand = expansion(0,0),limits=c(-0.2,1.5)) +
-  scale_fill_paletteer_d("jcolors::pal9") +
-  scale_color_paletteer_d("jcolors::pal9") +
+  scale_x_continuous(expand = expansion(0,0),limits=c(-0.2,1.5)) +  ## adjusting the limits to include the labels in the plot area
+  scale_fill_paletteer_d("jcolors::pal9") +   ## for the colors of the bar
+  scale_color_paletteer_d("jcolors::pal9") +  ## for the color of the labels
   coord_flip() +
   theme_nothing()+
   theme(axis.line.y = element_blank(),
@@ -104,7 +106,7 @@ pob_plot <- pob %>%
         axis.text.y = element_blank(),
         plot.title = element_markdown("Karla", face = "bold", size = 20, color = "gray50", hjust = 0.22, lineheight = 1.3))
 
-
+# Lollipop plot
 entered_plot <- entered %>% 
   ggplot(aes(entered, pct)) +
   geom_segment( aes(x=entered, xend=entered, y=0, yend=pct), size = 2, show.legend = FALSE, color = "#FF7844") +
